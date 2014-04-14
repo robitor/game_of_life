@@ -45,13 +45,14 @@ class GameOfLife(object):
                 self.changelist.append((row, col))
                 newboard[row][col] = new_state
 
+            #Checking the alive cell's neighbors
             for i in range(-1, 2):
                 for j in range(-1, 2):
                     x_idx = (col + j) % self.width
                     y_idx = (row + i) % self.height
                     neighbor = (y_idx, x_idx)
 
-                    if (x_idx != col or y_idx != row and
+                    if ((x_idx != col or y_idx != row) and
                         neighbor not in self.alivelist and
                         neighbor not in new_alivelist and
                         neighbor not in self.changelist):
@@ -98,7 +99,7 @@ class GameOfLife(object):
         """
         Updates the GUI representation of the board
         """
-        for cell in  self.changelist:
+        for cell in self.changelist:
             #cell = self.changelist.pop()
             row = cell[0]
             col = cell[1]
@@ -124,7 +125,7 @@ class GameOfLife(object):
         """
         Initializes the GUI representation of the board 
 
-        Additionally populates the change list 
+        Additionally, populates the change list 
         """
         cell_list = []
         for row in range(self.height):
