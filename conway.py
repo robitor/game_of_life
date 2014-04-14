@@ -8,7 +8,7 @@ rohan.shah@utexas.edu
 """
 import Tkinter as tk
 import copy
-
+import random
 
 
 class GameOfLife(object):
@@ -80,6 +80,9 @@ class GameOfLife(object):
         """
         Updates the GUI representation of the board
         """
+        r = lambda: random.randint(0,255)
+        new_color = ('#%02X%02X%02X' % (r(), r(), r()))
+ 
         while self.changelist:
             cell = self.changelist.pop()
             row = cell[0]
@@ -87,7 +90,8 @@ class GameOfLife(object):
 
             bgcolor = '#FFFFFF'
             if board[row][col] == 1:
-                bgcolor = '#000000'
+                bgcolor = new_color
+                #bgcolor = '#000000' #uncomment if you don't like colors
                 if self.cell_list[row * self.width + col] is None:
                     cell_object = tk.Canvas(self.root, bg=bgcolor, 
                         width=8, height=8, highlightthickness=0)
