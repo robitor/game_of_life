@@ -14,16 +14,15 @@ import copy
 class GameOfLife(object):
     """This class plays Conway's Game of Life"""
 
-    def __init__(self):
+    def __init__(self, width, height, path):
         self.root = tk.Tk()
-        self.width = 100
-        self.height = 32
-        self.root.geometry(str(self.width * 8) + 'x' + str(self.height * 8))
-
-        self.path = "./pattern_convert"
-        self.generation = 600
+        self.width = width
+        self.height = height
+        self.path = path #path to the file that has the board pattern
+        self.iterations = 700 #number of iterations to do
+        self.speed = 100 #speed of iteration in ms
         self.changelist = [] #used to keep track of the cells that changed
-        self.alivelist = []
+        self.alivelist = [] #keep track of the cells that are currently alive
         self.board = self.board_from_file()
         self.cell_list = self.board_init()
 
@@ -36,7 +35,6 @@ class GameOfLife(object):
         new_alivelist = []
         print "Iteration: " + str(iteration)
         for cell in self.alivelist:
-
             row = cell[0]
             col = cell[1]
             new_state = int(self.is_cell_on(row, col))
@@ -52,34 +50,28 @@ class GameOfLife(object):
                     x_idx = (col + j) % self.width
                     y_idx = (row + i) % self.height
                     neighbor = (y_idx, x_idx)
-                    if x_idx != col or y_idx != row:
-                        if neighbor not in self.alivelist:
-                            if neighbor not in new_alivelist:
-                                if neighbor not in self.changelist:
-                                    new_state = int(self.is_cell_on(y_idx, x_idx))
-                                    if new_state:
-                                        new_alivelist.append((y_idx, x_idx))
-                                    if self.board[y_idx][x_idx] != new_state:
-                                        self.changelist.append((y_idx, x_idx))
-                                        newboard[y_idx][x_idx] = new_state
 
-         
+                    if (x_idx != col or y_idx != row and
+                        neighbor not in self.alivelist and
+                        neighbor not in new_alivelist and
+                        neighbor not in self.changelist):
+
+                        new_state = int(self.is_cell_on(y_idx, x_idx))
+
+                        if new_state:
+                            new_alivelist.append((y_idx, x_idx))
+
+                        if self.board[y_idx][x_idx] != new_state:
+                            self.changelist.append((y_idx, x_idx))
+                            newboard[y_idx][x_idx] = new_state
+
         self.board_update(newboard)
         self.board = newboard
         self.alivelist = new_alivelist
         if iteration > 1:
-            self.root.after(100, self.iterate, iteration - 1)
+            self.root.after(self.speed, self.iterate, iteration - 1)
         else:
             print "Finished."
-
-    def print_board(self, board):
-        """
-        Prints the board to STDOUT
-        """
-        for row in board:
-            print row
-
-        print
 
     def board_from_file(self):
         """
@@ -106,9 +98,11 @@ class GameOfLife(object):
         """
         Updates the GUI representation of the board
         """
-        for cell in self.changelist:
+        for cell in  self.changelist:
+            #cell = self.changelist.pop()
             row = cell[0]
             col = cell[1]
+
             bgcolor = '#FFFFFF'
             if board[row][col] == 1:
                 bgcolor = '#000000'
@@ -186,11 +180,11 @@ class GameOfLife(object):
 
     def play(self):
         """Starts the game"""
-        self.root.after(1000, self.iterate, self.generation)
+        self.root.after(1000, self.iterate, self.iterations)
         self.root.mainloop()
 
 if __name__ == "__main__":
-    game = GameOfLife()
+    game = GameOfLife(100, 32, "./pattern_convert")
     game.play()
 
 
