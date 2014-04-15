@@ -7,7 +7,6 @@ Created by Rohan Shah
 rohan.shah@utexas.edu
 """
 import Tkinter as tk
-import copy
 import random
 
 
@@ -21,7 +20,6 @@ class GameOfLife(object):
         self.height = height
         self.path = path #path to the file that has the board pattern
         self.iterations = 700 #number of iterations to do
-        self.changelist = [] #used to keep track of the cells that changed
         self.alivelist = [] #keep track of the cells that are currently alive
         self.board = self.board_from_file()
         self.cell_list = self.board_init() #stores the cell widgets
@@ -51,7 +49,7 @@ class GameOfLife(object):
         """
         Initializes the GUI representation of the board 
 
-        Additionally, populates the change list 
+        Additionally, populates the alive
         """
         cell_list = []
         for row in range(self.height):
@@ -61,7 +59,6 @@ class GameOfLife(object):
                 if self.board[row][col] == 1:
                     paint = True
                     bgcolor = '#000000'
-                    self.changelist.append((row, col))
                     self.alivelist.append((row, col))
                 elif row == 0 or col == 0:
                     paint = True
@@ -76,20 +73,23 @@ class GameOfLife(object):
                     cell_list.append(None)  
         return cell_list
  
-    def board_update(self, board):
+    def board_update(self, changelist):
         """
         Updates the GUI representation of the board
         """
         r = lambda: random.randint(0,255)
         new_color = ('#%02X%02X%02X' % (r(), r(), r()))
  
-        while self.changelist:
-            cell = self.changelist.pop()
+        for cell in changelist:
             row = cell[0]
             col = cell[1]
 
-            bgcolor = '#FFFFFF'
-            if board[row][col] == 1:
+            if self.board[row][col] == 1:
+                new_state = 0
+            else:
+                new_state = 1
+
+            if new_state:
                 bgcolor = new_color
                 #bgcolor = '#000000' #uncomment if you don't like colors
                 if self.cell_list[row * self.width + col] is None:
@@ -103,7 +103,7 @@ class GameOfLife(object):
             else:
                 if self.cell_list[row * self.width + col] is not None:
                     self.cell_list[row
-                     * self.width + col].config(bg=bgcolor)
+                     * self.width + col].config(bg="#FFFFFF")
 
     def is_cell_on(self, row, col):
         """
@@ -122,9 +122,7 @@ class GameOfLife(object):
     def iterate(self, iteration):
         """Main method for computing the next generation """
 
-        newboard = copy.deepcopy(self.board)
-
-        self.changelist = []
+        changelist = []
         new_alivelist = []
         print "Iterations left: " + str(iteration)
         for cell in self.alivelist:
@@ -135,8 +133,7 @@ class GameOfLife(object):
             if new_state:
                 new_alivelist.append((row, col))
             if self.board[row][col] != new_state:
-                self.changelist.append((row, col))
-                newboard[row][col] = new_state
+                changelist.append((row, col))
 
             #Checking the alive cell's neighbors
             for i in range(-1, 2):
@@ -148,7 +145,7 @@ class GameOfLife(object):
                     if ((x_idx != col or y_idx != row) and
                         neighbor not in self.alivelist and
                         neighbor not in new_alivelist and
-                        neighbor not in self.changelist):
+                        neighbor not in changelist):
 
                         new_state = int(self.is_cell_on(y_idx, x_idx))
 
@@ -156,16 +153,27 @@ class GameOfLife(object):
                             new_alivelist.append((y_idx, x_idx))
 
                         if self.board[y_idx][x_idx] != new_state:
-                            self.changelist.append((y_idx, x_idx))
-                            newboard[y_idx][x_idx] = new_state
+                            changelist.append((y_idx, x_idx))
 
-        self.board_update(newboard)
-        self.board = newboard
+
+        self.board_update(changelist)
+        self.board_update_map(changelist)
         self.alivelist = new_alivelist
         if iteration > 1:
-            self.root.after(self.speed, self.iterate, iteration - 1)
+            self.root.after(self.speed, self.iterate, 
+                iteration - 1)
         else:
             print "Finished."
+
+    def board_update_map(self, changelist):
+        """Updates the bit representation of the board"""
+        for cell in changelist:
+            row = cell[0]
+            col = cell[1]
+            if self.board[row][col] == 1:
+                self.board[row][col] = 0
+            else:
+                self.board[row][col] = 1
 
     def num_on_cells(self, row, col):
         """
