@@ -73,9 +73,7 @@ class GameOfLife(object):
         return cell_list
  
     def board_update_gui(self, changelist):
-        """
-        Updates the GUI representation of the board
-        """
+        """Updates the GUI representation of the board"""
         rand = lambda: random.randint(0, 255)
         new_color = ('#%02X%02X%02X' % (rand(), rand(), rand()))
  
@@ -115,9 +113,7 @@ class GameOfLife(object):
                 self.board[row][col] = 1
 
     def is_cell_on(self, row, col):
-        """
-        Determines if current cell should be on or off for next generation
-        """
+        """Determines if current cell should be on or off for next generation"""
         num = self.num_on_cells(row, col)
         current_state = self.board[row][col]
         if num < 2:
@@ -129,7 +125,7 @@ class GameOfLife(object):
         return False   
   
     def iterate(self, iteration):
-        """Main method for computing the next generation """
+        """Main method for computing the next generation"""
 
         changelist = []
         new_alivelist = []
