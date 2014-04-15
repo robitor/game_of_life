@@ -18,13 +18,12 @@ class GameOfLife(object):
         self.root = tk.Tk()
         self.width = width
         self.height = height
-        self.path = path #path to the file that has the board pattern
         self.iterations = 700 #number of iterations to do
         self.alivelist = [] #keep track of the cells that are currently alive
-        self.board = self.board_from_file()
+        self.board = self.board_from_file(path)
         self.cell_list = self.board_init() #stores the cell widgets
 
-    def board_from_file(self):
+    def board_from_file(self, path):
         """
         Returns a 2D list from initial pattern in file at self.path
         
@@ -32,7 +31,7 @@ class GameOfLife(object):
         Board dimensions must match those specified
         """
         board = []
-        with open(self.path) as board_file:
+        with open(path) as board_file:
             for row in board_file:
                 row_list = list(row.rstrip())
                 row_int_list = [int(i) for i in row_list]
@@ -73,12 +72,12 @@ class GameOfLife(object):
                     cell_list.append(None)  
         return cell_list
  
-    def board_update(self, changelist):
+    def board_update_gui(self, changelist):
         """
         Updates the GUI representation of the board
         """
-        r = lambda: random.randint(0,255)
-        new_color = ('#%02X%02X%02X' % (r(), r(), r()))
+        rand = lambda: random.randint(0, 255)
+        new_color = ('#%02X%02X%02X' % (rand(), rand(), rand()))
  
         for cell in changelist:
             row = cell[0]
@@ -166,7 +165,7 @@ class GameOfLife(object):
                             changelist.append((y_idx, x_idx))
 
 
-        self.board_update(changelist)
+        self.board_update_gui(changelist)
         self.board_update_map(changelist)
         self.alivelist = new_alivelist
         if iteration > 1:
