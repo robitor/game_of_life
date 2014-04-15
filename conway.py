@@ -104,6 +104,16 @@ class GameOfLife(object):
                 if self.cell_list[row * self.width + col] is not None:
                     self.cell_list[row
                      * self.width + col].config(bg="#FFFFFF")
+    
+    def board_update_map(self, changelist):
+        """Updates the bit representation of the board"""
+        for cell in changelist:
+            row = cell[0]
+            col = cell[1]
+            if self.board[row][col] == 1:
+                self.board[row][col] = 0
+            else:
+                self.board[row][col] = 1
 
     def is_cell_on(self, row, col):
         """
@@ -164,16 +174,6 @@ class GameOfLife(object):
                 iteration - 1)
         else:
             print "Finished."
-
-    def board_update_map(self, changelist):
-        """Updates the bit representation of the board"""
-        for cell in changelist:
-            row = cell[0]
-            col = cell[1]
-            if self.board[row][col] == 1:
-                self.board[row][col] = 0
-            else:
-                self.board[row][col] = 1
 
     def num_on_cells(self, row, col):
         """
