@@ -1,5 +1,8 @@
 An implementation of Conway's Game of Life
 
+![alt tag](./conway.gif)
+
+
 Game requires the Tkinter library
 
 Created by Rohan Shah
